@@ -95,3 +95,41 @@ def create_task(task: TaskCreate):
         
         # Return the newly created task
         return {"id": new_id, "title": task.title, "done": False}
+
+# --- STAGE 3: UPDATE AND DELETE ---
+class TaskUpdate(BaseModel):
+    title: str
+    done: bool
+
+@app.put("/tasks/{task_id}")
+def update_task(task_id: int, task: TaskUpdate):
+    if not task.title.strip():
+        raise HTTPException(status_code=400, detail="Title cannot be empty")
+        
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Run the UPDATE query
+        cursor.execute(
+            "UPDATE tasks SET title = ?, done = ? WHERE id = ?", 
+            (task.title, task.done, task_id)
+        )
+        conn.commit()
+        
+        # cursor.rowcount tells us how many rows were affected
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+            
+        return {"id": task_id, "title": task.title, "done": task.done}
+
+@app.delete("/tasks/{task_id}", status_code=204)
+def delete_task(task_id: int):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+            
+        return None # 204 No Content expects an empty body
