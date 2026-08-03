@@ -52,72 +52,60 @@ def read_root():
 def read_health():
     return {"status": "ok"}
 
-# --- STAGE 2: In-Memory Data and Read Endpoints ---
-# FlyRank wants an id (number), title (text), and done (boolean).
-class TaskCreate(BaseModel):
-    title: str
-    done: bool = False
+# --- STAGE 1: READ FROM DATABASE ---
 
-class Task(TaskCreate):
-    id: int
-
-# Initialize with 3 sample tasks
-tasks: List[Task] = [
-    Task(id=1, title="Watch the W2 lecture", done=True),
-    Task(id=2, title="Read MDN: How the web works", done=False),
-    Task(id=3, title="Buy milk", done=False)
-]
-
-# Provide the next available ID
-def get_next_id():
-    if not tasks:
-        return 1
-    return max(t.id for t in tasks) + 1
-
-@app.get("/tasks", response_model=List[Task])
+@app.get("/tasks")
 def get_tasks():
-    return tasks
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tasks")
+        # Fetch all rows and convert them to standard Python dictionaries
+        return [dict(row) for row in cursor.fetchall()]
 
-@app.get("/tasks/{task_id}", response_model=Task)
+@app.get("/tasks/{task_id}")
 def get_task(task_id: int):
-    for task in tasks:
-        if task.id == task_id:
-            return task
-    # Stage 2: Return 404 with JSON error if unknown
-    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        # Pass the task_id as a tuple: (task_id,)
+        cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+        task = cursor.fetchone()
+        
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return dict(task)
 
 # --- STAGE 3: Create ---
-@app.post("/tasks", response_model=Task, status_code=201)
-def create_task(task: TaskCreate):
-    # Stage 3: Empty string validation (FastAPI/Pydantic automatically handles missing fields)
-    if not task.title.strip():
-        raise HTTPException(status_code=400, detail="title is required")
+# @app.post("/tasks", response_model=Task, status_code=201)
+# def create_task(task: TaskCreate):
+#     # Stage 3: Empty string validation (FastAPI/Pydantic automatically handles missing fields)
+#     if not task.title.strip():
+#         raise HTTPException(status_code=400, detail="title is required")
         
-    new_task = Task(id=get_next_id(), title=task.title, done=task.done)
-    tasks.append(new_task)
-    return new_task
+#     new_task = Task(id=get_next_id(), title=task.title, done=task.done)
+#     tasks.append(new_task)
+#     return new_task
 
-# --- STAGE 4: Update & Delete ---
-@app.put("/tasks/{task_id}", response_model=Task)
-def update_task(task_id: int, task_update: TaskCreate):
-    if not task_update.title.strip():
-        raise HTTPException(status_code=400, detail="title is required")
+# # --- STAGE 4: Update & Delete ---
+# @app.put("/tasks/{task_id}", response_model=Task)
+# def update_task(task_id: int, task_update: TaskCreate):
+#     if not task_update.title.strip():
+#         raise HTTPException(status_code=400, detail="title is required")
         
-    for task in tasks:
-        if task.id == task_id:
-            task.title = task_update.title
-            task.done = task_update.done
-            return task
+#     for task in tasks:
+#         if task.id == task_id:
+#             task.title = task_update.title
+#             task.done = task_update.done
+#             return task
             
-    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+#     raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
-@app.delete("/tasks/{task_id}", status_code=204)
-def delete_task(task_id: int):
-    for index, task in enumerate(tasks):
-        if task.id == task_id:
-            tasks.pop(index)
-            return
+# @app.delete("/tasks/{task_id}", status_code=204)
+# def delete_task(task_id: int):
+#     for index, task in enumerate(tasks):
+#         if task.id == task_id:
+#             tasks.pop(index)
+#             return
             
-    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+#     raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
 # --- STAGE 5: Swagger UI is automatically available at /docs ---
