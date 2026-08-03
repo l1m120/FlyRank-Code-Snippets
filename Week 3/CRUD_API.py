@@ -74,38 +74,24 @@ def get_task(task_id: int):
             raise HTTPException(status_code=404, detail="Task not found")
         return dict(task)
 
-# --- STAGE 3: Create ---
-# @app.post("/tasks", response_model=Task, status_code=201)
-# def create_task(task: TaskCreate):
-#     # Stage 3: Empty string validation (FastAPI/Pydantic automatically handles missing fields)
-#     if not task.title.strip():
-#         raise HTTPException(status_code=400, detail="title is required")
+# --- STAGE 2: CREATE NEW TASKS ---
+class TaskCreate(BaseModel):
+    title: str
+
+@app.post("/tasks", status_code=201)
+def create_task(task: TaskCreate):
+    # Basic validation
+    if not task.title.strip():
+        raise HTTPException(status_code=400, detail="Title cannot be empty")
         
-#     new_task = Task(id=get_next_id(), title=task.title, done=task.done)
-#     tasks.append(new_task)
-#     return new_task
-
-# # --- STAGE 4: Update & Delete ---
-# @app.put("/tasks/{task_id}", response_model=Task)
-# def update_task(task_id: int, task_update: TaskCreate):
-#     if not task_update.title.strip():
-#         raise HTTPException(status_code=400, detail="title is required")
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        # Insert the new task using placeholders (?)
+        cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", (task.title, 0))
+        conn.commit()
         
-#     for task in tasks:
-#         if task.id == task_id:
-#             task.title = task_update.title
-#             task.done = task_update.done
-#             return task
-            
-#     raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
-# @app.delete("/tasks/{task_id}", status_code=204)
-# def delete_task(task_id: int):
-#     for index, task in enumerate(tasks):
-#         if task.id == task_id:
-#             tasks.pop(index)
-#             return
-            
-#     raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
-# --- STAGE 5: Swagger UI is automatically available at /docs ---
+        # SQLite automatically generated the ID, let's grab it
+        new_id = cursor.lastrowid
+        
+        # Return the newly created task
+        return {"id": new_id, "title": task.title, "done": False}
