@@ -52,4 +52,38 @@ content-type: application/json
 ### 📸 Interactive Documentation (Swagger UI)
 FastAPI automatically generates interactive OpenAPI documentation based on the Python type hints. Below is the Swagger UI capturing all 7 active endpoints running successfully:
 
-![Swagger UI Screenshot](./FastAPI_output.png)
+![Swagger UI Screenshot](Week 2/FastAPI_output.png)
+
+## Week 3: SQLite Database Integration
+
+### 🗄️ Why SQLite?
+For Week 3, the in-memory data store was replaced with a real database. SQLite was chosen because it requires absolutely zero manual setup, operates entirely out of a single local file, and provides immediate data persistence so that records survive server restarts.
+
+### 💾 Storage Details & Auto-Creation
+The database lives in a local file named `tasks.db` in the root directory.
+
+* **Zero-Setup Cloning:** The codebase is designed to automatically create the `tasks.db` file, generate the `tasks` table, and seed it with three example tasks the very first time the application runs. There is no manual database configuration required.
+* **Git-Ignored:** The `tasks.db` file is added to `.gitignore` so that anyone cloning this repository starts with a completely fresh, empty database.
+
+### 🚀 Running the Project
+You can start the project using a single command. Running this on a fresh clone will automatically initialize the database and seed the data within seconds:
+
+```bash
+python -m uvicorn CRUD_API:app --reload
+```
+
+After running the project, execute the GET /tasks request to return the available tasks 
+![Get Tasks Screenshot](Week 3/get_tasks_output.png)
+
+### 🔍 Example SQL Query
+During Stage 4 testing, direct queries were executed against the database using DB Browser for SQLite. Here is an example query used to count the total number of tasks currently stored to ensure seeding was successful:
+
+``` bash
+SELECT COUNT(*) FROM tasks;
+```
+
+### 📸 Database Verification (DB Browser)
+Below is a screenshot of the tasks.db file opened directly in DB Browser for SQLite, proving the data persists correctly outside of the API:
+
+![Get Tasks Screenshot](Week 3/SQL_output.png)
+
