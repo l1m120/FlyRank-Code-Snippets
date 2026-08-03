@@ -52,4 +52,4 @@ content-type: application/json
 ### 📸 Interactive Documentation (Swagger UI)
 FastAPI automatically generates interactive OpenAPI documentation based on the Python type hints. Below is the Swagger UI capturing all 7 active endpoints running successfully:
 
-![FastAPI UI Screenshot](./FastAPI_output.png)
+![Swagger UI Screenshot](./FastAPI_output.png)
