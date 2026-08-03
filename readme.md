@@ -52,7 +52,7 @@ content-type: application/json
 ### 📸 Interactive Documentation (Swagger UI)
 FastAPI automatically generates interactive OpenAPI documentation based on the Python type hints. Below is the Swagger UI capturing all 7 active endpoints running successfully:
 
-![Swagger UI Screenshot](Week 2/FastAPI_output.png)
+![Swagger UI Screenshot](week-2/FastAPI_output.png)
 
 ## Week 3: SQLite Database Integration
 
@@ -73,7 +73,8 @@ python -m uvicorn CRUD_API:app --reload
 ```
 
 After running the project, execute the GET /tasks request to return the available tasks 
-![Get Tasks Screenshot](Week 3/get_tasks_output.png)
+
+![Get Tasks Screenshot](week-3/get_tasks_output.png)
 
 ### 🔍 Example SQL Query
 During Stage 4 testing, direct queries were executed against the database using DB Browser for SQLite. Here is an example query used to count the total number of tasks currently stored to ensure seeding was successful:
@@ -85,5 +86,5 @@ SELECT COUNT(*) FROM tasks;
 ### 📸 Database Verification (DB Browser)
 Below is a screenshot of the tasks.db file opened directly in DB Browser for SQLite, proving the data persists correctly outside of the API:
 
-![Get Tasks Screenshot](Week 3/SQL_output.png)
+![Get Tasks Screenshot](week-3/SQL_output.png)
 
