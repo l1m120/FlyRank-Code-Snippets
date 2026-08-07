@@ -182,13 +182,19 @@ http://localhost:8000/docs
 Retrieve all tasks using `curl`:
 
 ```bash
-curl -i http://localhost:8000/tasks
+curl.exe -i http://localhost:8000/tasks
 ```
 
 ### Example Output
 
 ```text
-[ PASTE YOUR CURL TERMINAL OUTPUT HERE ]
+HTTP/1.1 200 OK
+date: Fri, 07 Aug 2026 05:58:17 GMT
+server: uvicorn
+content-length: 145
+content-type: application/json
+
+[{"id":1,"title":"Learn Docker","done":true},{"id":2,"title":"Connect Postgres","done":false},{"id":3,"title":"Write Compose File","done":false}]
 ```
 
 ---
@@ -197,11 +203,8 @@ curl -i http://localhost:8000/tasks
 
 Below is proof that the PostgreSQL database is running inside Docker and that data is successfully persisted using Docker volumes.
 
-> Insert your screenshot here.
 
-```text
-[ DATABASE SCREENSHOT ]
-```
+![DB Screenshot](week-3-2/db_output.png)
 
 ---
 
