@@ -1,13 +1,12 @@
 services:
   api:
     build: .
-    image: week3-api-fresh  # <-- This new name bypasses all the broken caches!
-    ports:
-      - "8000:8000"
+    ports: ["8000:8000"]
     environment:
-      DATABASE_URL: postgresql://postgres:dev@db:5432/tasks
+      DATABASE_URL: postgres://postgres:dev@db:5432/tasks
     depends_on:
-      - db
+      db:
+        condition: service_healthy  # <-- Tells the API to wait for the healthcheck
 
   db:
     image: postgres:16
@@ -18,6 +17,11 @@ services:
       - "5432:5432"
     volumes:
       - taskdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tasks"] # <-- Tests if DB is awake
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   taskdata:

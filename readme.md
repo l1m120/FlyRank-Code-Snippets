@@ -88,3 +88,120 @@ Below is a screenshot of the tasks.db file opened directly in DB Browser for SQL
 
 ![Get Tasks Screenshot](week-3-1/SQL_output.png)
 
+## Week 3: Containerized Task API
+
+### 📌 What This Is
+
+This is a RESTful CRUD API built with **Python** and **FastAPI**, backed by a real **PostgreSQL** database. Both the application and the database run entirely inside **Docker containers** and are orchestrated using **Docker Compose**.
+
+By utilizing **Docker volumes**, the PostgreSQL database persists its data even if the containers are stopped, removed, or recreated.
+
+---
+
+### 🚀 Features
+
+- RESTful CRUD API built with FastAPI
+- PostgreSQL database running in Docker
+- Docker Compose for multi-container orchestration
+- Persistent database storage using Docker volumes
+- Automatic database initialization and sample data seeding
+- Interactive Swagger API documentation
+
+---
+
+### 🛠️ Tech Stack
+
+- Python
+- FastAPI
+- PostgreSQL
+- Docker
+- Docker Compose
+- SQLAlchemy
+- Pydantic
+
+---
+
+### ⚡ Quickstart
+
+#### 1. Create the environment file
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+#### 2. Start the application
+
+Run both the API and PostgreSQL containers:
+
+```bash
+docker compose up
+```
+
+> **Note**
+>
+> During the first startup, the API will automatically:
+>
+> - Connect to PostgreSQL
+> - Create the `tasks` table
+> - Seed the database with three example tasks
+
+---
+
+### 🌐 Access the Application
+
+API Base URL:
+
+```text
+http://localhost:8000
+```
+
+Swagger Documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+### API Endpoints
+
+| Method | Endpoint | Description | Status Codes |
+|---------|----------|-------------|--------------|
+| **GET** | `/tasks` | Retrieve all tasks | `200` |
+| **GET** | `/tasks/{id}` | Retrieve a task by ID | `200`, `404` |
+| **POST** | `/tasks` | Create a new task | `201`, `400` |
+| **PUT** | `/tasks/{id}` | Update a task's title or `done` status | `200`, `400`, `404` |
+| **DELETE** | `/tasks/{id}` | Delete a task | `204`, `404` |
+
+---
+
+### Example Request
+
+Retrieve all tasks using `curl`:
+
+```bash
+curl -i http://localhost:8000/tasks
+```
+
+### Example Output
+
+```text
+[ PASTE YOUR CURL TERMINAL OUTPUT HERE ]
+```
+
+---
+
+### Database Persistence Proof
+
+Below is proof that the PostgreSQL database is running inside Docker and that data is successfully persisted using Docker volumes.
+
+> Insert your screenshot here.
+
+```text
+[ DATABASE SCREENSHOT ]
+```
+
+---
+
