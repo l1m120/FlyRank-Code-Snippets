@@ -3,6 +3,7 @@ import psycopg
 from fastapi import FastAPI
 from psycopg.rows import dict_row
 from dotenv import load_dotenv
+from fastapi import HTTPException
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -31,3 +32,20 @@ def startup():
                 cur.execute("INSERT INTO tasks (title, done) VALUES (%s, %s)", ("Connect Postgres", False))
                 cur.execute("INSERT INTO tasks (title, done) VALUES (%s, %s)", ("Write Compose File", False))
         conn.commit()
+
+@app.get("/tasks")
+def get_tasks():
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM tasks")
+            return cur.fetchall()
+
+@app.get("/tasks/{task_id}")
+def get_task(task_id: int):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
+            task = cur.fetchone()
+            if not task:
+                raise HTTPException(status_code=404, detail="Task not found")
+            return task
