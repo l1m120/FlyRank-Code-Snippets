@@ -208,3 +208,294 @@ Below is proof that the PostgreSQL database is running inside Docker and that da
 
 ---
 
+## Secured Task API — Authentication & Authorization
+
+### 📌 What This Is
+
+This is a **secure RESTful API** built with **Python and FastAPI**, featuring a complete authentication and authorization system backed by **Supabase**.
+
+The project demonstrates modern backend security practices by delegating identity management and cryptographic operations, such as password hashing and JWT signing, to a trusted **Identity Provider (Supabase)**.
+
+The application allows users to:
+
+* Create an account
+* Log in and receive a JSON Web Token (JWT)
+* Use the JWT as a Bearer token to access protected routes
+* Log out of their active session
+* Access protected user-specific data
+* Reuse a centralized authentication dependency across multiple protected endpoints
+
+The project also includes a reusable authentication guard that verifies the user's JWT through Supabase before allowing access to restricted resources.
+
+---
+
+### 🛠️ Tech Stack
+
+* **Python**
+* **FastAPI**
+* **Supabase**
+* **Pydantic**
+* **Uvicorn**
+* **python-dotenv**
+* **JWT Authentication**
+* **Swagger / OpenAPI**
+
+---
+
+### 🚀 Setup & Quickstart
+
+#### 1. Clone the Repository
+
+```bash
+git clone <your-repository-url>
+cd <your-repository-folder>
+```
+
+#### 2. Set Up Environment Variables
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+> ⚠️ **Important:** Never commit your real `.env` file to GitHub.
+
+Open `.env` and fill in your Supabase project credentials:
+
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
+```
+
+Make sure your environment variable names match those used in your application.
+
+---
+
+#### 3. Install Dependencies
+
+Install the required Python packages:
+
+```bash
+pip install fastapi uvicorn supabase python-dotenv pydantic
+```
+
+Alternatively, if the project includes a `requirements.txt` file:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+#### 4. Start the FastAPI Server
+
+Run the development server:
+
+```bash
+python -m uvicorn main:app --reload --port 8000
+```
+
+The API will be available at:
+
+```text
+http://localhost:8000
+```
+
+---
+
+### 📚 API Documentation
+
+FastAPI automatically generates interactive API documentation.
+
+#### Swagger UI
+
+Open:
+
+```text
+http://localhost:8000/docs
+```
+
+#### ReDoc
+
+Open:
+
+```text
+http://localhost:8000/redoc
+```
+
+Swagger UI allows you to directly test the API endpoints from your browser.
+
+---
+
+### 🔐 Authentication Flow
+
+The authentication process follows this general flow:
+
+```text
+┌──────────────┐
+│    Client    │
+└──────┬───────┘
+       │
+       │ 1. Sign Up / Login
+       ▼
+┌──────────────┐
+│   FastAPI    │
+└──────┬───────┘
+       │
+       │ 2. Authentication Request
+       ▼
+┌──────────────┐
+│   Supabase   │
+│     Auth     │
+└──────┬───────┘
+       │
+       │ 3. JWT Access Token
+       ▼
+┌──────────────┐
+│    Client    │
+└──────┬───────┘
+       │
+       │ 4. Bearer Token
+       ▼
+┌──────────────┐
+│   Protected  │
+│    Route     │
+└──────┬───────┘
+       │
+       │ 5. Verify JWT
+       ▼
+┌──────────────┐
+│   Supabase   │
+│ Token Verify │
+└──────┬───────┘
+       │
+       │ 6. Authorized
+       ▼
+┌──────────────┐
+│ Protected    │
+│    Data      │
+└──────────────┘
+```
+
+### How It Works
+
+1. The user registers through `/auth/signup`.
+2. The user logs in through `/auth/login`.
+3. Supabase authenticates the user and returns a JWT access token.
+4. The client stores the access token.
+5. The client sends the token with protected requests:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+6. FastAPI extracts the Bearer token.
+7. The authentication dependency verifies the token through Supabase.
+8. If the token is valid, access to the protected endpoint is granted.
+9. If the token is invalid or missing, the request is rejected.
+
+---
+
+### 🔗 API Endpoints
+
+| Method | Endpoint               | Description                                            | Requires Auth? |
+| ------ | ---------------------- | ------------------------------------------------------ | -------------- |
+| `POST` | `/auth/signup`         | Register a new user account with email and password    | ❌ No           |
+| `POST` | `/auth/login`          | Authenticate a user and receive a JWT (`access_token`) | ❌ No           |
+| `POST` | `/auth/logout`         | End the user's active session                          | ✅ Yes          |
+| `GET`  | `/public/info`         | Retrieve generic public information                    | ❌ No           |
+| `GET`  | `/protected/profile`   | Retrieve secure profile data                           | ✅ Yes          |
+| `GET`  | `/protected/dashboard` | Access an additional protected route                   | ✅ Yes          |
+
+> 🔒 Protected routes require the JWT to be included in the request header:
+>
+> ```http
+> Authorization: Bearer <token>
+> ```
+
+---
+
+## 🧪 Example Authentication Request
+
+### Sign Up
+
+```http
+POST /auth/signup
+Content-Type: application/json
+```
+
+Example request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+```
+
+---
+
+### Login
+
+```http
+POST /auth/login
+Content-Type: application/json
+```
+
+Example request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+```
+
+A successful login returns an access token similar to:
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer"
+}
+```
+
+---
+
+### Accessing a Protected Endpoint
+
+Include the returned JWT in the `Authorization` header:
+
+```http
+GET /protected/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+---
+
+## 🔑 Swagger UI & Bearer Authentication
+
+FastAPI's built-in Swagger UI has been configured with an `HTTPBearer` security scheme.
+
+This adds an **Authorize 🔒** button to the Swagger documentation.
+
+Instead of manually adding the JWT to every request, you can:
+
+1. Log in through `/auth/login`.
+2. Copy the returned `access_token`.
+3. Click **Authorize** in Swagger UI.
+4. Enter the token.
+5. Click **Authorize**.
+6. Test protected endpoints directly from the browser.
+
+This makes it much easier to demonstrate and test the authentication system.
+
+### Swagger UI Preview
+
+> 📸 Add a screenshot of the Swagger UI here.
+>
+> Example:
+>
+> `![Swagger UI](docs/images/swagger-auth.png)`
+
