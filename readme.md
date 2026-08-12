@@ -208,7 +208,7 @@ Below is proof that the PostgreSQL database is running inside Docker and that da
 
 ---
 
-## Secured Task API — Authentication & Authorization
+## Week 4: Secured Task API — Authentication & Authorization
 
 ### 📌 What This Is
 
@@ -416,7 +416,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-## 🧪 Example Authentication Request
+### 🧪 Example Authentication Request
 
 ### Sign Up
 
@@ -474,7 +474,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 
 ---
 
-## 🔑 Swagger UI & Bearer Authentication
+### 🔑 Swagger UI & Bearer Authentication
 
 FastAPI's built-in Swagger UI has been configured with an `HTTPBearer` security scheme.
 
