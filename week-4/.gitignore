@@ -1,0 +1,7 @@
+.env
+__pycache__/
+
+# .env
+SUPABASE_URL=https://wulzxxsxinhsjstcdmcc.supabase.co/rest/v1/
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1bHp4eHN4aW5oc2pzdGNkbWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MDA0MzIsImV4cCI6MjEwMjA3NjQzMn0.T2KLqno-o_xFm6m5rQClMBrHicjN-LZ8KLDzigw-pKE
+PORT=8000
