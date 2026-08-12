@@ -493,9 +493,5 @@ This makes it much easier to demonstrate and test the authentication system.
 
 ### Swagger UI Preview
 
-> 📸 Add a screenshot of the Swagger UI here.
->
-> Example:
->
-> `![Swagger UI](docs/images/swagger-auth.png)`
+![Swagger UI](week-4/swagger_output.png)`
 
