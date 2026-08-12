@@ -42,11 +42,20 @@ def login(creds: UserCredentials):
 def public_info():
     return {"message": "Welcome stranger! This info is public."}
 
-@app.get("/protected/profile")
+@app.get("/protected/profile", status_code=200)
 def protected_profile(request: Request):
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Access token required")
     
     token = auth_header.split(" ")[1]
-    return {"message": "Token received, but not verified yet", "token": token}
+    try:
+        # This network call verifies the signature and expiration
+        user_res = supabase.auth.get_user(token)
+        return {
+            "id": user_res.user.id, 
+            "email": user_res.user.email, 
+            "created_at": str(user_res.user.created_at)
+        }
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
