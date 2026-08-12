@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from fastapi import Request
 from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 load_dotenv()
 
@@ -86,3 +87,13 @@ def logout(user = Depends(get_current_user)):
 @app.get("/protected/dashboard", status_code=200)
 def dashboard(user = Depends(get_current_user)):
     return {"message": f"Welcome to your private dashboard, {user.email}"}
+
+security = HTTPBearer()
+
+# Update the guard to use HTTPBearer
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials # FastAPI automatically extracts the token string
+    try:
+        return supabase.auth.get_user(token).user
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
